@@ -1,0 +1,193 @@
+package AirPlainPack;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class AirPlain
+ */
+@WebServlet("/AirPlain")
+public class AirPlain extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public AirPlain() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Auto-generated method stub
+
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+
+		String action = request.getParameter("action");
+
+		TicketDaoClass ticketManagment = new TicketDaoClass();
+		TicketClass _ticketObj = new TicketClass();
+
+		if (action.equals("AddAirPlaneTicket")) {
+			PrintWriter outInsertMessage = response.getWriter();
+			try {
+				String name = request.getParameter("name");
+				String source = request.getParameter("source");
+				String destination = request.getParameter("destination");
+				String date = request.getParameter("date");
+				int flightNumber = Integer.parseInt(request.getParameter("flightNumber"));
+
+				_ticketObj.setDate(date);
+				_ticketObj.setDestination(destination);
+				_ticketObj.setFlightNumber(flightNumber);
+				_ticketObj.setName(name);
+				_ticketObj.setSorce(source);
+
+				boolean checkAdd = ticketManagment.insert(_ticketObj);
+
+				int ticketId = ticketManagment.showTicketId(_ticketObj);
+
+				outInsertMessage.write("<!DOCTYPE html>");
+				outInsertMessage.write("<html>");
+				outInsertMessage.write("<body>");
+				if (checkAdd == true) {
+
+					outInsertMessage.write(
+							"<h3 style='background-color: #BDFF94;width : 30%;'>Your reservation has been recorded </h3>");
+					outInsertMessage
+							.write("<h4 style='color: #1F4869;width : 80%;'>Your Ticket Id is : <INPUT style='width : 30px;' disabled='disabled' VALUE="
+									+ ticketId + "></h4>");
+				} else {
+					outInsertMessage.write("<h1>Your Data Saved  Failed</h1>");
+				}
+				outInsertMessage.write("</body>");
+				outInsertMessage.write("</html>");
+
+				outInsertMessage.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		else if (action.equals("DeleteAirPlaneTicket")) {
+			PrintWriter outDeleteTicket = response.getWriter();
+			int ticketId = Integer.parseInt(request.getParameter("ticketIdForDelete"));
+
+			boolean checkDelete = ticketManagment.delete(ticketId);
+
+			outDeleteTicket.write("<!DOCTYPE html>");
+			outDeleteTicket.write("<html>");
+			outDeleteTicket.write("<body>");
+			if (checkDelete == true) {
+				outDeleteTicket.write("<h3 style='background-color: #BDFF94;width : 30%;'>Your Ticket is Delete </h3>");
+			} else {
+				outDeleteTicket.write("<h1>Your Ticket is not Delete/h1>");
+			}
+			outDeleteTicket.write("</body>");
+			outDeleteTicket.write("</html>");
+
+			outDeleteTicket.close();
+
+		}
+
+		else if (action.equals("AirPlainShowTicketInformation")) {
+			int ticketId = Integer.parseInt(request.getParameter("ticketNumberForUpdate"));
+
+			_ticketObj = ticketManagment.showTicket(ticketId);
+
+			PrintWriter writer = response.getWriter();
+		
+			writer.write("<!DOCTYPE html>");
+			writer.write("<html>");
+			writer.write("<body>");
+
+			writer.write("<form action='Update' method='get'>");
+			writer.write("<table>");
+			writer.write("<tr>");
+			writer.write("<td>TicketId : </td>");
+			writer.write("<td><INPUT TYPE=TEXT NAME=ticketId id=ticketId VALUE=" + ticketId + "></td>");
+			writer.write("</tr>");
+
+			writer.write("<tr>");
+			writer.write("<td>Name : </td>");
+			writer.write("<td><INPUT TYPE=TEXT NAME=name id=name VALUE=" + _ticketObj.getName() + "></td>");
+			writer.write("</tr>");
+
+			writer.write("<tr>");
+			writer.write("<td>Source : </td>");
+			writer.write("<td><INPUT TYPE=TEXT NAME=source VALUE=" + _ticketObj.getSorce() + "></td>");
+			writer.write("</tr>");
+
+			writer.write("<tr>");
+			writer.write("<td>Destination : </td>");
+			writer.write("<td><INPUT TYPE=TEXT NAME=destination VALUE=" + _ticketObj.getDestination() + "></td>");
+			writer.write("</tr>");
+
+			writer.write("<tr>");
+			writer.write("<td>Date : </td>");
+			writer.write("<td><INPUT TYPE=TEXT NAME=date VALUE=" + _ticketObj.getDate() + "></td>");
+			writer.write("</tr>");
+
+			writer.write("<tr>");
+			writer.write("<td>Flight Number : </td>");
+			writer.write("<td><INPUT TYPE=TEXT NAME=flightNumber VALUE=" + _ticketObj.getFlightNumber() + "></td>");
+			writer.write("</tr>");
+
+			writer.write("<tr>");
+			writer.write("<td colspan='2' ><input  type='submit' value='Update Ticket Information'></td>");
+			// writer.write("<input type='hidden' name='action'
+			// value='UpdateAirPlaneTicket'>");
+
+			writer.write("</tr>");
+
+			writer.write("</table>");
+			writer.write("</form>");
+			writer.write("</body>");
+			writer.write("</html>");
+
+			writer.close();
+
+		}
+
+		/*
+		 * else if(action.equals("AirPlainUpdateTicketInformation")) { int
+		 * ticketId=Integer.parseInt(request.getParameter("id")); String
+		 * name=request.getParameter("name"); String
+		 * source=request.getParameter("source"); String
+		 * destination=request.getParameter("destination"); String
+		 * date=request.getParameter("date");
+		 * 
+		 * boolean checkUpdate=ticketManagment.update(_ticketObj,ticketId);
+		 * 
+		 * if (checkUpdate == true) out.print("Ok");
+		 * 
+		 * else out.println("wrong"); }
+		 * 
+		 * out.close();
+		 */
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
