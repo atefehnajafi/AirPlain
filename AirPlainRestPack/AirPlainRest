@@ -1,0 +1,64 @@
+package AirPlainRestPack;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import AirPlainPack.TicketClass;
+import AirPlainPack.TicketDaoClass;
+
+@Path("tickets")
+public class AirPlainRest {
+	TicketDaoClass ticketManager=new TicketDaoClass();
+
+	
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public TicketClass read(@PathParam("id") int ticketId)
+	{
+		//	return Response.status(200).entity("with id" +empId+ "employee : zahra ").build();
+		//TicketClass ticket = new TicketClass();
+		TicketClass ticket =  ticketManager.showTicket(ticketId);
+		return ticket;	
+	}
+	
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces(MediaType.APPLICATION_JSON)
+	public Response insert(TicketClass ticket)
+	{
+		boolean checkAdd=ticketManager.insert(ticket);
+		if(checkAdd==true)
+		return Response.status(200).entity("ticket registered").build();
+		else
+			return Response.status(400).entity("Error ").build();
+	}
+	
+	@PUT
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response update(@PathParam("id") int ticketId, TicketClass t)
+	{
+		ticketManager.update(t,ticketId);
+		return Response.status(200).entity("ticket with" + ticketId + " updated").build();
+	}
+
+	@DELETE
+	@Path("/{id}")
+	public Response delete(@PathParam("id") int ticketId)
+	{
+		
+		return Response.status(200).entity("Ticket deleted").build();
+	}
+	
+	
+}
